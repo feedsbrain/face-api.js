@@ -35,8 +35,8 @@ export class AgeGenderNet extends NeuralNetwork<NetParams> {
         ? this.faceFeatureExtractor.forwardInput(input)
         : input
 
-      const pooled = tf.avgPool(bottleneckFeatures, [7, 7], [2, 2], 'valid').as2D(bottleneckFeatures.shape[0], -1)
-      const age = fullyConnectedLayer(pooled, params.fc.age).as1D()
+      const pooled = tf.reshape<tf.Rank.R2>(tf.avgPool(bottleneckFeatures, [7, 7], [2, 2], 'valid'), [bottleneckFeatures.shape[0], -1])
+      const age = tf.reshape<tf.Rank.R1>(fullyConnectedLayer(pooled, params.fc.age), [-1])
       const gender = fullyConnectedLayer(pooled, params.fc.gender)
       return { age, gender }
     })

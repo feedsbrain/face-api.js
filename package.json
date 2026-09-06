@@ -6,21 +6,13 @@
   "main": "./build/commonjs/index.js",
   "typings": "./build/commonjs/index.d.ts",
   "scripts": {
-    "rollup-min": "rollup -c rollup.config.js --environment minify:true",
-    "rollup": "rollup -c rollup.config.js",
+    "rollup-min": "rollup -c rollup.config.mjs --environment minify:true",
+    "rollup": "rollup -c rollup.config.mjs",
     "tsc": "tsc",
     "tsc-es6": "tsc --p tsconfig.es6.json",
     "build": "rm -rf ./build && rm -rf ./dist && npm run rollup && npm run rollup-min && npm run tsc && npm run tsc-es6",
-    "test": "npm run test-browser && npm run test-node",
-    "test-browser": "karma start --single-run",
-    "test-node": "ts-node -r ./test/env.node.ts node_modules/jasmine/bin/jasmine --config=jasmine-node.js",
-    "test-facelandmarknets": "set UUT=faceLandmarkNet&& karma start",
-    "test-facerecognitionnet": "set UUT=faceRecognitionNet&& karma start",
-    "test-agegendernet": "set UUT=ageGenderNet&& karma start",
-    "test-ssdmobilenetv1": "set UUT=ssdMobilenetv1&& karma start",
-    "test-tinyfacedetector": "set UUT=tinyFaceDetector&& karma start",
-    "test-globalapi": "set UUT=globalApi&& karma start",
-    "test-cpu": "set BACKEND_CPU=true&& karma start",
+    "test": "npm run build && npm run smoke",
+    "smoke": "node scripts/smoke.js",
     "docs": "typedoc --options ./typedoc.config.js ./src"
   },
   "keywords": [
@@ -33,26 +25,22 @@
   "author": "justadudewhohacks",
   "license": "MIT",
   "dependencies": {
-    "@tensorflow/tfjs-core": "1.7.0",
-    "tslib": "^1.11.1"
+    "@tensorflow/tfjs-backend-cpu": "^4.22.0",
+    "@tensorflow/tfjs-backend-webgl": "^4.22.0",
+    "@tensorflow/tfjs-core": "^4.22.0",
+    "tslib": "^2.8.1"
   },
   "devDependencies": {
-    "@tensorflow/tfjs-node": "1.7.0",
-    "@types/jasmine": "^3.5.9",
-    "@types/node": "^13.9.2",
-    "canvas": "2.6.1",
-    "jasmine": "^3.5.0",
-    "jasmine-core": "^3.5.0",
-    "karma": "^4.4.1",
-    "karma-chrome-launcher": "^3.1.0",
-    "karma-jasmine": "^3.1.1",
-    "karma-typescript": "^5.0.1",
-    "rollup": "^2.1.0",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-typescript2": "^0.26.0",
-    "rollup-plugin-uglify": "^6.0.4",
-    "ts-node": "^8.7.0",
-    "typescript": "^3.8.3"
+    "@rollup/plugin-commonjs": "^28.0.1",
+    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.1",
+    "@tensorflow/tfjs-node": "^4.22.0",
+    "@types/node": "^22.9.0",
+    "canvas": "^3.1.0",
+    "rollup": "^4.27.0",
+    "tslib": "^2.8.1",
+    "typedoc": "^0.28.20",
+    "typescript": "~5.9.3"
   }
 }

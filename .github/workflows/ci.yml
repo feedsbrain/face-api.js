@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [master, 'modernize/**']
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [18, 20, 22]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install native build deps for node-canvas
+        run: sudo apt-get update && sudo apt-get install -y libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type-check + bundle (tsc + rollup)
+        run: npm run build
+
+      - name: Smoke test (model load + numeric fixtures + full pipeline)
+        run: npm run smoke

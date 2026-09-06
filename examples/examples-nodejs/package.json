@@ -1,7 +1,23 @@
 {
+  "name": "face-api.js-examples-nodejs",
+  "private": true,
   "author": "justadudewhohacks",
   "license": "MIT",
+  "scripts": {
+    "face-detection": "ts-node faceDetection.ts",
+    "face-landmark-detection": "ts-node faceLandmarkDetection.ts",
+    "face-expression-recognition": "ts-node faceExpressionRecognition.ts",
+    "age-and-gender-recognition": "ts-node ageAndGenderRecognition.ts",
+    "face-recognition": "ts-node faceRecognition.ts"
+  },
   "dependencies": {
-    "face-api.js": "../../"
+    "@tensorflow/tfjs-node": "^4.22.0",
+    "canvas": "^3.1.0",
+    "face-api.js": "file:../.."
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.9.3"
   }
 }

@@ -1,4 +1,9 @@
 import * as tf from '@tensorflow/tfjs-core';
+// tfjs-core 4.x ships no backend of its own; pull in cpu + webgl so they
+// self-register with the bundled core (browser picks webgl, node's
+// tfjs-node backend still wins on priority when present).
+import '@tensorflow/tfjs-backend-cpu';
+import '@tensorflow/tfjs-backend-webgl';
 
 import * as draw from './draw';
 import * as utils from './utils';

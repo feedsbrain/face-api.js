@@ -3,7 +3,7 @@ import { isMediaLoaded } from './isMediaLoaded';
 
 export function awaitMediaLoaded(media: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement) {
 
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     if (media instanceof env.getEnv().Canvas || isMediaLoaded(media)) {
       return resolve()
     }
@@ -12,7 +12,7 @@ export function awaitMediaLoaded(media: HTMLImageElement | HTMLVideoElement | HT
       if (!e.currentTarget) return
       e.currentTarget.removeEventListener('load', onLoad)
       e.currentTarget.removeEventListener('error', onError)
-      resolve(e)
+      resolve()
     }
 
     function onError(e: Event) {

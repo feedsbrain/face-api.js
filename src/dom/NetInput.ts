@@ -128,14 +128,14 @@ export class NetInput {
         const input = this.getInput(batchIdx)
 
         if (input instanceof tf.Tensor) {
-          let imgTensor = isTensor4D(input) ? input : input.expandDims<tf.Rank.R4>()
+          let imgTensor = isTensor4D(input) ? input : tf.expandDims<tf.Tensor4D>(input)
           imgTensor = padToSquare(imgTensor, isCenterInputs)
 
           if (imgTensor.shape[1] !== inputSize || imgTensor.shape[2] !== inputSize) {
             imgTensor = tf.image.resizeBilinear(imgTensor, [inputSize, inputSize])
           }
 
-          return imgTensor.as3D(inputSize, inputSize, 3)
+          return tf.reshape<tf.Rank.R3>(imgTensor, [inputSize, inputSize, 3])
         }
 
         if (input instanceof env.getEnv().Canvas) {
@@ -145,7 +145,7 @@ export class NetInput {
         throw new Error(`toBatchTensor - at batchIdx ${batchIdx}, expected input to be instanceof tf.Tensor or instanceof HTMLCanvasElement, instead have ${input}`)
       })
 
-      const batchTensor = tf.stack(inputTensors.map(t => t.toFloat())).as4D(this.batchSize, inputSize, inputSize, 3)
+      const batchTensor = tf.reshape<tf.Rank.R4>(tf.stack(inputTensors.map(t => tf.cast(t, 'float32'))), [this.batchSize, inputSize, inputSize, 3])
 
       return batchTensor
     })

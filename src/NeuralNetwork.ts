@@ -102,7 +102,7 @@ export abstract class NeuralNetwork<TNetParams> {
     const { manifestUri, modelBaseUri } = getModelUris(filePath, this.getDefaultModelName())
 
     const fetchWeightsFromDisk = (filePaths: string[]) => Promise.all(
-      filePaths.map(filePath => readFile(filePath).then(buf => buf.buffer))
+      filePaths.map(filePath => readFile(filePath).then(buf => buf.buffer as ArrayBuffer))
     )
     const loadWeights = tf.io.weightsLoaderFactory(fetchWeightsFromDisk)
 
