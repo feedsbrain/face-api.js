@@ -25,6 +25,8 @@
   "author": "justadudewhohacks",
   "license": "MIT",
   "dependencies": {
+    "@tensorflow/tfjs-backend-cpu": "^4.22.0",
+    "@tensorflow/tfjs-backend-webgl": "^4.22.0",
     "@tensorflow/tfjs-core": "^4.22.0",
     "tslib": "^2.8.1"
   },
