@@ -1,6 +1,5 @@
 const express = require('express')
 const path = require('path')
-const { get } = require('request')
 
 const app = express()
 
@@ -13,6 +12,8 @@ app.use(express.static(path.join(__dirname, './public')))
 app.use(express.static(path.join(__dirname, '../images')))
 app.use(express.static(path.join(__dirname, '../media')))
 app.use(express.static(path.join(__dirname, '../../weights')))
+// serves the freshly built UMD bundle: the views load it as <script src="face-api.js">
+// (run `npm run build` in the repo root first)
 app.use(express.static(path.join(__dirname, '../../dist')))
 
 app.get('/', (req, res) => res.redirect('/face_detection'))
@@ -40,34 +41,21 @@ app.post('/fetch_external_image', async (req, res) => {
     return res.status(400).send('imageUrl param required')
   }
   try {
-    const externalResponse = await request(imageUrl)
-    res.set('content-type', externalResponse.headers['content-type'])
-    return res.status(202).send(Buffer.from(externalResponse.body))
+    // Node >= 18 ships a global fetch
+    const externalResponse = await fetch(imageUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36'
+      }
+    })
+    if (!externalResponse.ok) {
+      return res.status(404).send(`upstream responded with ${externalResponse.status}`)
+    }
+    const buf = Buffer.from(await externalResponse.arrayBuffer())
+    res.set('content-type', externalResponse.headers.get('content-type') || 'application/octet-stream')
+    return res.status(202).send(buf)
   } catch (err) {
     return res.status(404).send(err.toString())
   }
 })
 
 app.listen(3000, () => console.log('Listening on port 3000!'))
-
-function request(url, returnBuffer = true, timeout = 10000) {
-  return new Promise(function(resolve, reject) {
-    const options = Object.assign(
-      {},
-      {
-        url,
-        isBuffer: true,
-        timeout,
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36'
-        }
-      },
-      returnBuffer ? { encoding: null } : {}
-    )
-
-    get(options, function(err, res) {
-      if (err) return reject(err)
-      return resolve(res)
-    })
-  })
-}
