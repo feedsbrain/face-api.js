@@ -1,0 +1,72 @@
+name: Publish
+
+# Publishes the built package to GitHub Packages (npm.pkg.github.com) as
+# @feedsbrain/face-api.js whenever a GitHub Release is published.
+#
+# The package name on disk stays the unscoped "face-api.js" so it keeps working
+# as a git dependency (npm i feedsbrain/face-api.js). This workflow rewrites the
+# name to the owner scope only for the registry publish.
+#
+# Consumers install it with an .npmrc:
+#   @feedsbrain:registry=https://npm.pkg.github.com
+#   //npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g. 0.22.3). Defaults to package.json.'
+        required: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install native build deps for node-canvas
+        run: sudo apt-get update && sudo apt-get install -y libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://npm.pkg.github.com
+          scope: '@feedsbrain'
+
+      - run: npm ci
+
+      - name: Build (tsc + rollup)
+        run: npm run build
+
+      - name: Smoke test
+        run: npm run smoke
+
+      - name: Resolve version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          elif [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="$(node -p "require('./package.json').version")"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Publishing version $VERSION"
+
+      - name: Set scoped name + version for registry publish
+        run: |
+          npm pkg set name='@feedsbrain/face-api.js'
+          npm version --no-git-tag-version --allow-same-version "${{ steps.version.outputs.version }}"
+
+      - name: Publish to GitHub Packages
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

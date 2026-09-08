@@ -109,6 +109,38 @@ Or install it via npm:
 npm i face-api.js
 ```
 
+### Installing this fork (`feedsbrain/face-api.js`)
+
+This fork is modernized for Node 18–22 and TensorFlow.js 4.x. It is not published
+to the public npm registry. Install it one of two ways:
+
+**Directly from GitHub** (builds on install via the `prepare` script — needs a
+working toolchain, which is the norm for a git dependency):
+
+``` bash
+npm i github:feedsbrain/face-api.js
+# or pin a tag / commit
+npm i github:feedsbrain/face-api.js#v0.22.3
+```
+
+**From GitHub Packages** as `@feedsbrain/face-api.js` (published by the
+`Publish` workflow on every GitHub Release). Add an `.npmrc` next to your
+`package.json`:
+
+```
+@feedsbrain:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+then:
+
+``` bash
+npm i @feedsbrain/face-api.js
+```
+
+GitHub Packages requires an authenticated token even for public installs; use a
+personal access token (or `GITHUB_TOKEN` in CI) with the `read:packages` scope.
+
 <a name="face-api.js-for-nodejs"></a>
 
 # face-api.js for Nodejs
